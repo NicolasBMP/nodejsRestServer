@@ -1,29 +1,62 @@
 const { response, request } = require('express');
+const bcryptjs = require('bcryptjs');
+const User = require('../models/user');
 
-const GetUser = (req, res = response) => {
+const GetUser = async (req, res = response) => {
+    const { limit = 15, from = 0 } = req.query;
+    const query = { estado: true };
+    const usuarios = await User.find(query).skip(Number(from)).limit(Number(limit));
+    //AUX
+    /* const [total, users] = await Promise.all([
+        User.countDocuments(query),
+        User.find(query).skip(Number(from)).limit(Number(limit))
+    ]); */
     res.json({
-        'msj': 'GET - From controller'
+        size: usuarios.length,
+        usuarios: usuarios
     });
 }
 
-const InsertUser = (req = request, res = response) => {
-    console.log(req.body);
-    res.json({
-        'msj': 'POST - From controller'
+const InsertUser = async (req = request, res = response) => {
+    //const { name, email, password, ...rest } = req.body;
+    const { name, email, password, role } = req.body;
+    const user = new User({
+        name,
+        email,
+        password,
+        role
+    });
+    const salt = bcryptjs.genSaltSync();
+    user.password = bcryptjs.hashSync(password, salt);
+    await user.save();
+    return res.json({
+        msj: 'POST - From controller'
     });
 }
 
-const DeletetUser = (req, res = response) => {
+const DeletetUser = async (req, res = response) => {
+    const { id } = req.params;
+    //Fisicamente
+    //const user = await User.findByIdAndDelete(id);
+    //Actualizar estado
+    const user = await User.findByIdAndUpdate(id, { estado: false });
     res.json({
-        'msj': 'DELETE - From controller'
+        msj: 'DELETE - From controller',
+        user
     });
 }
 
-const UpdatetUser = (req = request, res = response) => {
-    console.log(req.params);
-    console.log(req.query);
+const UpdatetUser = async (req = request, res = response) => {
+    const { id } = req.params;
+    const { password, google, email, ...rest } = req.body;
+    if (password) {
+        const salt = bcryptjs.genSaltSync();
+        rest.password = bcryptjs.hashSync(password, salt);
+    }
+    const user = await User.findByIdAndUpdate(id, rest);
     res.json({
-        'msj': 'PUT - From controller'
+        msj: 'PUT - From controller',
+        user
     });
 }
 

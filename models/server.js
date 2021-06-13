@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { dbConnection } = require('../database/config');
 
 /* const corsOptions = {
     origin: 'http://example.com',
@@ -10,8 +11,13 @@ class Server {
     constructor() {
         this.app = express();
         this.port = process.env.PORT;
+        this.connectDB();
         this.middlewares();
         this.routes();
+    }
+
+    async connectDB() {
+        await dbConnection();
     }
 
     middlewares() {
