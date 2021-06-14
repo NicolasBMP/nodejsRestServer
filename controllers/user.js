@@ -18,7 +18,6 @@ const GetUser = async (req, res = response) => {
 }
 
 const InsertUser = async (req = request, res = response) => {
-    //const { name, email, password, ...rest } = req.body;
     const { name, email, password, role } = req.body;
     const user = new User({
         name,
@@ -36,6 +35,7 @@ const InsertUser = async (req = request, res = response) => {
 
 const DeletetUser = async (req, res = response) => {
     const { id } = req.params;
+    //const AU = req.AU;
     //Fisicamente
     //const user = await User.findByIdAndDelete(id);
     //Actualizar estado
