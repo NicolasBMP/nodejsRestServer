@@ -1,5 +1,7 @@
 const Role = require('../models/role');
 const User = require('../models/user');
+const Category = require('../models/category');
+const Product = require('../models/product');
 const { response, request } = require('express');
 
 const validRole = async (role = '') => {
@@ -41,9 +43,70 @@ const validAdminRole = (req = request, res = response, next) => {
     next();
 }
 
+const validCategoryI = async (name = '') => {
+    const existecategoria = await Category.findOne({ name: name.toUpperCase() });
+    if (existecategoria) {
+        throw new Error(`Ya existe la categoría: ${name} en la BD.`);
+    }
+}
+
+const validCategoryU = async (req = request, res = response, next) => {
+    const { id } = req.params;
+    const { name } = req.body;
+    const existecategoria = await Category.findOne({ name: name.toUpperCase(), _id: { $ne: id } });
+    if (existecategoria) {
+        return res.status(401).json({
+            msj: `Ya existe la categoría: ${name} en la BD.`
+        });
+    }
+    next();
+}
+
+const validCategorybyID = async (id) => {
+    const existecategoria = await Category.findById(id);
+    if (!existecategoria) {
+        throw new Error(`No existe la categoría con el ID: ${id} en la BD.`);
+    }
+}
+
+const validProductI = async (name = '') => {
+    const existeproducto = await Product.findOne({ name: name });
+    if (existeproducto) {
+        throw new Error(`Ya existe el producto: ${name} en la BD.`);
+    }
+}
+
+const validProductU = async (req = request, res = response, next) => {
+    const { id } = req.params;
+    const { name } = req.body;
+    const existeproducto = await Product.findOne({
+        name: name.toUpperCase(),
+        _id: { $ne: id }
+    });
+    if (existeproducto) {
+        return res.status(401).json({
+            msj: `Ya existe el producto: ${name} en la BD.`
+        });
+    }
+    next();
+}
+
+const validProductbyID = async (id) => {
+    const existeproducto = await Product.findById(id);
+    if (!existeproducto) {
+        throw new Error(`No existe el producto con el ID: ${id} en la BD.`);
+    }
+}
+
 module.exports = {
     validRole: validRole,
     validEmail: validEmail,
     validUser: validUser,
-    validAdminRole: validAdminRole
+    validAdminRole: validAdminRole,
+    validCategoryI: validCategoryI,
+    validCategoryU: validCategoryU,
+    validCategorybyID: validCategorybyID,
+    validProductbyID: validProductbyID,
+    validProductI: validProductI,
+    validProductU: validProductU
 }
