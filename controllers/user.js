@@ -35,7 +35,6 @@ const InsertUser = async (req = request, res = response) => {
 
 const DeletetUser = async (req, res = response) => {
     const { id } = req.params;
-    //const AU = req.AU;
     //Fisicamente
     //const user = await User.findByIdAndDelete(id);
     //Actualizar estado
@@ -54,6 +53,18 @@ const UpdatetUser = async (req = request, res = response) => {
         rest.password = bcryptjs.hashSync(password, salt);
     }
     const user = await User.findByIdAndUpdate(id, rest);
+    //Añadir campos en la actualizacion para la coleccion
+    //const user = await User.findByIdAndUpdate(id, { $set: { rest } });
+    //Agregar data a arrays dentro de una coleccion
+    //const user = await User.findByIdAndUpdate(id, { $push: { rest } });
+    //Quitar data a arrays dentro de una coleccion
+    //const user = await User.findByIdAndUpdate(id, { $unset: { "(coleccion).(coleccion-interna):" '' } });
+    //query de colecciones internas
+    //const user = await User.find({ "(coleccion).(coleccion-interna):" 'FILTRO' }});
+    //Actualizacion masiva
+    //const user = await User.findByIdAndUpdate(id, rest, { multi: true });
+    //No mostrar atributos
+    //const usuarios = await User.find(query, { "_id": 0 }).skip(Number(from)).limit(Number(limit));
     res.json({
         msj: 'PUT - From controller',
         user
